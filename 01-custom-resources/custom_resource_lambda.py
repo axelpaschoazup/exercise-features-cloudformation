@@ -69,6 +69,11 @@ def send_response(event, context, response):
 
     return True
 
+def hasKey(keypairsList, keyPair):
+    for key in keypairsList:
+        if(key['KeyName']==keyPair):
+            return False
+    return True
 
 def custom_resource_handler(event, context):
     
@@ -89,14 +94,17 @@ def custom_resource_handler(event, context):
     if event['RequestType'] == 'Create':
         try:
             print("Creating key name %s" % str(pem_key_name))
-
-            key = ec2.create_key_pair(KeyName=pem_key_name)
-            key_material = key['KeyMaterial']
-            s3 = boto3.resource('s3')
-            object = s3.Object(BUCKET, f'pem/{pem_key_name}.pem')
-            object.put(Body=key_material)
-            
-           
+            responseKey = ec2.describe_key_pairs()
+            keyPairs = responseKey['KeyPairs']
+            if(hasKey(keyPairs,pem_key_name)):
+                key = ec2.create_key_pair(KeyName=pem_key_name)
+                key_material = key['KeyMaterial']
+                s3 = boto3.resource('s3')
+                obj = s3.Object(BUCKET, f'pem/{pem_key_name}.pem')
+                respObj = obj.put(Body=key_material)
+                print(f'{BUCKET}/pem/{pem_key_name}.pem')
+                print(str(obj))
+                print(str(respObj))
             print(f'The parameter {pem_key_name} has been created.')
 
             response = 'SUCCESS'

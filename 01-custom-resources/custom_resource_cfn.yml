@@ -19,7 +19,6 @@ Parameters:
 Resources:
   SSHKeyCR:
       Type: Custom::CreateSSHKey
-      Version: "1.0"
       Properties:
         ServiceToken: !Ref FunctionArn
         KeyName: !Ref SSHKeyName
