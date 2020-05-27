@@ -99,9 +99,11 @@ def custom_resource_handler(event, context):
                 key = ec2.create_key_pair(KeyName=pem_key_name)
                 key_material = key['KeyMaterial']
                 s3 = boto3.resource('s3')
-                object = s3.Object(BUCKET, f'pem/{pem_key_name}.pem')
-                object.put(Body=key_material)
-                
+                obj = s3.Object(BUCKET, f'pem/{pem_key_name}.pem')
+                respObj = obj.put(Body=key_material)
+                print(f'{BUCKET}/pem/{pem_key_name}.pem')
+                print(str(obj))
+                print(str(respObj))
             print(f'The parameter {pem_key_name} has been created.')
 
             response = 'SUCCESS'
